@@ -15,7 +15,7 @@
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     
-    <!-- Particles.js for background effects -->
+    <!-- Particles.js Library -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     
     <style>
@@ -50,28 +50,24 @@
             box-sizing: border-box;
         }
         
-        html {
-            scroll-behavior: smooth;
-            overflow-x: hidden;
-        }
-        
-        body {
+        html, body {
+            height: 100%;
+            overflow: hidden !important;
             font-family: 'Inter', sans-serif;
             background: var(--bg-color);
             color: var(--text-color);
-            overflow-x: hidden;
-            position: relative;
         }
         
-        /* Animated Background */
+        /* Particles Container (Z-INDEX DÜZƏLİŞİ) */
         #particles-js {
             position: fixed;
             width: 100%;
             height: 100%;
             top: 0;
             left: 0;
-            z-index: -1;
-            opacity: 0.4;
+            z-index: 1; /* -1-dən 1-ə dəyişildi ki, body fonunu örtməsin */
+            background-color: transparent;
+            pointer-events: none;
         }
         
         .gradient-bg {
@@ -80,7 +76,7 @@
             height: 100%;
             top: 0;
             left: 0;
-            z-index: -2;
+            z-index: 0; /* -2-dən 0-a dəyişildi */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             opacity: 0.05;
         }
@@ -91,7 +87,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
-            padding: 1rem 5%;
+            padding: 1rem 3%;
             background: rgba(10, 10, 15, 0.95);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
@@ -162,6 +158,7 @@
             gap: 1.5rem;
         }
         
+        /* Theme Switch */
         .switch {
             position: relative;
             display: inline-block;
@@ -169,19 +166,12 @@
             height: 26px;
         }
         
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
         
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
             transition: .4s;
             border-radius: 34px;
@@ -199,56 +189,68 @@
             border-radius: 50%;
         }
         
-        input:checked + .slider:before {
-            transform: translateX(24px);
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* Language Switcher */
+        .lang-switch {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
         }
         
-        /* Main Content */
+        .lang-option {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            color: var(--secondary-color);
+        }
+        
+        .lang-option.active {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+        }
+
+        /* Main Content - Slides (Z-INDEX DÜZƏLİŞİ) */
         main {
             padding-top: 80px;
             min-height: 100vh;
+            position: relative; /* z-index-in işləməsi üçün */
+            z-index: 2; /* Particles-dən üstə olması üçün */
         }
         
-.slide {
-    min-height: calc(100vh - 80px);
-    display: block !important;
-    opacity: 0;
-    visibility: hidden;
-    padding: 3rem 5%;
-    position: absolute;
-    width: 100%;
-    top: 80px;
-    left: 0;
-}
-
-.slide.active {
-    opacity: 1 !important;
-    visibility: visible !important;
-    position: relative;
-}
-
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .slide {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 80px);
+            padding: 2rem 5%;
+            opacity: 0;
+            visibility: hidden;
+            overflow-y: auto;
         }
         
+        .slide.active {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
         
-      -content {
+        .slide-content {
             width: 100%;
             max-width: 1400px;
+            margin: 0 auto;
         }
         
         /* Hero Section */
-        #hero .slide-content {
-            text-align: center;
-            max-width: 900px;
+        #hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center !important;
         }
         
         #hero h1 {
@@ -296,25 +298,9 @@
             overflow: hidden;
         }
         
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
         .card:hover {
             transform: translateY(-10px) scale(1.02);
             border-color: var(--primary-color);
-        }
-        
-        .card:hover::before {
-            opacity: 0.1;
         }
         
         .card-icon {
@@ -353,23 +339,36 @@
         h2 {
             font-family: 'Poppins', sans-serif;
             font-size: clamp(2rem, 5vw, 3.5rem);
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             text-align: center;
             font-weight: 800;
         }
-        
-        /* Chart Container */
+
+        /* ---- 30/70 SPLIT LAYOUT FOR ANALYSIS SECTION ---- */
+        .analysis-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: stretch;
+            margin-bottom: 2rem;
+        }
+
         .chart-container {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            margin: 2rem 0;
             box-shadow: var(--shadow);
+            
+            /* 30% Width Logic */
+            flex: 0 0 30%;
+            width: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
         }
-        
-        /* Table */
+
         .table-container {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -377,7 +376,13 @@
             overflow: hidden;
             border: 1px solid var(--border-color);
             box-shadow: var(--shadow);
-            margin: 2rem 0;
+            
+            /* 70% Width Logic */
+            flex: 0 0 70%;
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
         }
         
         table {
@@ -386,7 +391,7 @@
         }
         
         th, td {
-            padding: 1.2rem 1.5rem;
+            padding: 1rem 1.2rem;
             text-align: left;
         }
         
@@ -406,16 +411,9 @@
             background: rgba(102, 126, 234, 0.05);
         }
         
-        .p-value-ok {
-            color: var(--success-color);
-            font-weight: 700;
-        }
-        
-        .p-value-bad {
-            color: var(--danger-color);
-            font-weight: 700;
-        }
-        
+        .p-value-ok { color: var(--success-color); font-weight: 700; }
+        .p-value-bad { color: var(--danger-color); font-weight: 700; }
+
         /* Buttons */
         .action-btn {
             display: inline-block;
@@ -430,27 +428,7 @@
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            margin-top: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .action-btn:hover::before {
-            width: 300px;
-            height: 300px;
+            margin-top: 1rem;
         }
         
         .action-btn:hover {
@@ -534,8 +512,7 @@
             border-radius: 10px;
         }
         
-        .myth-content h3,
-        .reality-content h3 {
+        .myth-content h3, .reality-content h3 {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -550,28 +527,6 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             margin: 2rem 0;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav {
-                display: none;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            footer {
-                bottom: 1rem;
-                right: 1rem;
-            }
-            
-            .control-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
         }
         
         /* Loading Animation */
@@ -606,6 +561,28 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .analysis-layout {
+                flex-direction: column;
+            }
+            .chart-container, .table-container {
+                flex: none;
+                width: 100%;
+            }
+            .chart-container {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .content-grid { grid-template-columns: 1fr; }
+            footer { bottom: 1rem; right: 1rem; }
+            .control-btn { width: 50px; height: 50px; font-size: 1.2rem; }
+            header { padding: 1rem; }
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -625,7 +602,7 @@
     
     <!-- Header -->
     <header>
-        <div class="logo" data-key="dept_name">HR Analitika</div>
+        <div class="logo" data-key="logo_text">HR Analitika</div>
         <nav>
             <a href="#hero" class="nav-link active" data-key="nav_hero">Giriş</a>
             <a href="#agenda" class="nav-link" data-key="nav_agenda">Gündəlik</a>
@@ -640,6 +617,13 @@
             <a href="#contact" class="nav-link" data-key="nav_contact">Əlaqə</a>
         </nav>
         <div class="controls">
+            <!-- Language Switcher -->
+            <div class="lang-switch">
+                <div class="lang-option active" onclick="changeLanguage('az')">AZ</div>
+                <div class="lang-option" onclick="changeLanguage('en')">EN</div>
+            </div>
+
+            <!-- Theme Toggle -->
             <label class="switch">
                 <input type="checkbox" id="theme-toggle">
                 <span class="slider"></span>
@@ -653,7 +637,7 @@
             <div class="slide-content">
                 <h1 data-key="hero_title">Rəqəmlərin Pıçıltısı</h1>
                 <p class="purpose-statement" data-key="hero_subtitle">HR Analitika ilə Yüksək Performansın DNT-sini Kəşf Etmək: İntuisiyadan Strateji Anlayışa Keçid.</p>
-                <button class="action-btn" onclick="nextSlide()">Səyahətə Başla →</button>
+                <button class="action-btn" onclick="nextSlide()" data-key="hero_btn">Səyahətə Başla →</button>
             </div>
         </section>
         
@@ -666,29 +650,29 @@
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
                         </div>
-                        <h3>1. Analitikanın Gücü</h3>
-                        <p>HR Analitikanın nə olduğunu və biznes qərarlarını necə dəyişdirdiyini anlayacağıq.</p>
+                        <h3 data-key="agenda_1_title">1. Analitikanın Gücü</h3>
+                        <p data-key="agenda_1_desc">HR Analitikanın nə olduğunu və biznes qərarlarını necə dəyişdirdiyini anlayacağıq.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <h3>2. Strateji Metriklər</h3>
-                        <p>İşçi təcrübəsinin nəbzini tutan eNPS və ESI kimi müasir indeksləri öyrənəcəyik.</p>
+                        <h3 data-key="agenda_2_title">2. Strateji Metriklər</h3>
+                        <p data-key="agenda_2_desc">İşçi təcrübəsinin nəbzini tutan eNPS və ESI kimi müasir indeksləri öyrənəcəyik.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
                         </div>
-                        <h3>3. Canlı Təhlil</h3>
-                        <p>Real data üzərində Reqressiya Analizi ilə yüksək performansı yaradan əsl səbəbləri axtaracağıq.</p>
+                        <h3 data-key="agenda_3_title">3. Canlı Təhlil</h3>
+                        <p data-key="agenda_3_desc">Real data üzərində Reqressiya Analizi ilə yüksək performansı yaradan əsl səbəbləri axtaracağıq.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
-                        <h3>4. Data Hekayələri</h3>
-                        <p>Analizin nəticələrini "danışdıraraq" biznes üçün strateji, data-əsaslı tövsiyələr çıxaracağıq.</p>
+                        <h3 data-key="agenda_4_title">4. Data Hekayələri</h3>
+                        <p data-key="agenda_4_desc">Analizin nəticələrini "danışdıraraq" biznes üçün strateji, data-əsaslı tövsiyələr çıxaracağıq.</p>
                     </div>
                 </div>
             </div>
@@ -697,39 +681,39 @@
         <!-- SLIDE 3: ABOUT ME -->
         <section id="me" class="slide">
             <div class="slide-content">
-                <h2>Spiker Haqqında</h2>
+                <h2 data-key="speaker_title">Spiker Haqqında</h2>
                 <div style="text-align: center; margin-bottom: 3rem;">
                     <h3 style="font-size: 2rem; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">Nizami Tahirov</h3>
-                    <p style="color: var(--secondary-color); font-size: 1.2rem;">HRIS & Rəqəmsallaşdırma Meneceri</p>
+                    <p style="color: var(--secondary-color); font-size: 1.2rem;" data-key="speaker_role">HRIS & Rəqəmsallaşdırma Meneceri</p>
                 </div>
                 <div class="content-grid">
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
-                        <h3>Peşəkar İcmal</h3>
-                        <p>8+ illik təcrübə ilə HR və data analitikası sahəsində fəaliyyət göstərirəm. Əsas hədəfim Microsoft Power Platform kimi alətlərlə prosesləri avtomatlaşdırmaq və data əsaslı strateji qərarları dəstəkləməkdir.</p>
+                        <h3 data-key="speaker_card1_title">Peşəkar İcmal</h3>
+                        <p data-key="speaker_card1_desc">8+ illik təcrübə ilə HR və data analitikası sahəsində fəaliyyət göstərirəm. Əsas hədəfim Microsoft Power Platform kimi alətlərlə prosesləri avtomatlaşdırmaq və data əsaslı strateji qərarları dəstəkləməkdir.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
                         </div>
-                        <h3>Təhsil və Sertifikatlar</h3>
-                        <p><strong>Təhsil:</strong> ADA Universiteti (HRM üzrə Magistr), BDU (Bakalavr).<br><strong>Sertifikatlar:</strong> 3x Microsoft Certified Trainer, Microsoft Excel Expert, Data Analytics with SQL & Power BI.</p>
+                        <h3 data-key="speaker_card2_title">Təhsil və Sertifikatlar</h3>
+                        <p data-key="speaker_card2_desc"><strong>Təhsil:</strong> ADA Universiteti (HRM üzrə Magistr), BDU (Bakalavr).<br><strong>Sertifikatlar:</strong> 3x Microsoft Certified Trainer, Microsoft Excel Expert, Data Analytics with SQL & Power BI.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <h3>Təcrübə</h3>
-                        <p>Data-əsaslı Performans İdarəetmə sistemlərinin qurulması, KPI-əsaslı Power BI dashboard-larının hazırlanması və HR proseslərinin 90%-nin avtomatlaşdırılması kimi layihələrə rəhbərlik etmişəm.</p>
+                        <h3 data-key="speaker_card3_title">Təcrübə</h3>
+                        <p data-key="speaker_card3_desc">Data-əsaslı Performans İdarəetmə sistemlərinin qurulması, KPI-əsaslı Power BI dashboard-larının hazırlanması və HR proseslərinin 90%-nin avtomatlaşdırılması kimi layihələrə rəhbərlik etmişəm.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                         </div>
-                        <h3>Portfel və Layihələr</h3>
-                        <p>McKinsey, AmCham, Willis Towers Watson kimi şirkətlərlə əməkdaşlıq; İşçi dövriyyəsi, məhsuldarlıq və kompensasiya üzrə analitik hesabatların və tətbiqlərin hazırlanması.</p>
+                        <h3 data-key="speaker_card4_title">Portfel və Layihələr</h3>
+                        <p data-key="speaker_card4_desc">McKinsey, AmCham, Willis Towers Watson kimi şirkətlərlə əməkdaşlıq; İşçi dövriyyəsi, məhsuldarlıq və kompensasiya üzrə analitik hesabatların və tətbiqlərin hazırlanması.</p>
                     </div>
                 </div>
             </div>
@@ -738,35 +722,35 @@
         <!-- SLIDE 4: ANALYTICS TYPES -->
         <section id="analytics" class="slide">
             <div class="slide-content">
-                <h2>HR Analitika: Kompasımız Nədir?</h2>
+                <h2 data-key="analytics_title">HR Analitika: Kompasımız Nədir?</h2>
                 <div class="content-grid">
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v8m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v12a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <h3>Təsviri</h3>
-                        <p><strong>"Nə baş verdi?"</strong><br>Keçən rüb işdən ayrılma faizi nə qədər oldu?</p>
+                        <h3 data-key="type_1_title">Təsviri</h3>
+                        <p data-key="type_1_desc"><strong>"Nə baş verdi?"</strong><br>Keçən rüb işdən ayrılma faizi nə qədər oldu?</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
-                        <h3>Diaqnostik</h3>
-                        <p><strong>"Niyə baş verdi?"</strong><br>Satış şöbəsində dövriyyə niyə digərlərindən yüksəkdir?</p>
+                        <h3 data-key="type_2_title">Diaqnostik</h3>
+                        <p data-key="type_2_desc"><strong>"Niyə baş verdi?"</strong><br>Satış şöbəsində dövriyyə niyə digərlərindən yüksəkdir?</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                         </div>
-                        <h3>Proqnozlaşdırıcı</h3>
-                        <p><strong>"Nə baş verəcək?"</strong><br>Hansı yüksək potensiallı işçilərin getmə riski var?</p>
+                        <h3 data-key="type_3_title">Proqnozlaşdırıcı</h3>
+                        <p data-key="type_3_desc"><strong>"Nə baş verəcək?"</strong><br>Hansı yüksək potensiallı işçilərin getmə riski var?</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                         </div>
-                        <h3>Tövsiyəedici</h3>
-                        <p><strong>"Nə etməliyik?"</strong><br>Döriyyəni azaltmaq üçün ən effektiv addım hansıdır?</p>
+                        <h3 data-key="type_4_title">Tövsiyəedici</h3>
+                        <p data-key="type_4_desc"><strong>"Nə etməliyik?"</strong><br>Döriyyəni azaltmaq üçün ən effektiv addım hansıdır?</p>
                     </div>
                 </div>
             </div>
@@ -775,15 +759,15 @@
         <!-- SLIDE 5: METRICS -->
         <section id="metrics" class="slide">
             <div class="slide-content">
-                <h2>Strateji Metriklər: Nəbzı Necə Tutmalı?</h2>
+                <h2 data-key="metrics_title">Strateji Metriklər: Nəbzı Necə Tutmalı?</h2>
                 <div class="content-grid">
                     <div class="card">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         </div>
                         <h3>eNPS (İşçi Loyallıq İndeksi)</h3>
-                        <p><strong>Məqsəd:</strong> İşçi loyallığını və şirkəti başqalarına tövsiyə etmə ehtimalını ölçür.</p>
-                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 0.9rem;">
+                        <p data-key="metrics_enps_desc"><strong>Məqsəd:</strong> İşçi loyallığını və şirkəti başqalarına tövsiyə etmə ehtimalını ölçür.</p>
+                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 0.9rem;" data-key="metrics_enps_calc">
                             <strong>Hesablama:</strong><br>
                             % Təbliğatçılar (9-10) - % Tənqidçilər (0-6)
                         </p>
@@ -793,22 +777,22 @@
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <h3>ESI (İşçi Məmnuniyyət İndeksi)</h3>
-                        <p><strong>Məqsəd:</strong> İşçinin hazırkı işindən ümumi məmnuniyyətini daha dərin ölçür.</p>
-                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 0.9rem;">
+                        <p data-key="metrics_esi_desc"><strong>Məqsəd:</strong> İşçinin hazırkı işindən ümumi məmnuniyyətini daha dərin ölçür.</p>
+                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.1); border-radius: 10px; font-size: 0.9rem;" data-key="metrics_esi_calc">
                             <strong>Hesablama:</strong><br>
                             [ (Orta Bal / 3) - 1 ] / 9 * 100
                         </p>
                     </div>
                     <div class="card">
-                        <h3>Digər Məşhur Metriklər</h3>
+                        <h3 data-key="metrics_other_title">Digər Məşhur Metriklər</h3>
                         <div style="margin-top: 1.5rem;">
-                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">İşə Qəbul</h4>
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;" data-key="metrics_recruiting">İşə Qəbul</h4>
                             <ul style="list-style: none; padding: 0; color: var(--secondary-color);">
                                 <li>• Time to Fill</li>
                                 <li>• Cost per Hire</li>
                                 <li>• Quality of Hire</li>
                             </ul>
-                            <h4 style="color: var(--primary-color); margin: 1rem 0 0.5rem;">Saxlama və Məşğulluq</h4>
+                            <h4 style="color: var(--primary-color); margin: 1rem 0 0.5rem;" data-key="metrics_retention">Saxlama və Məşğulluq</h4>
                             <ul style="list-style: none; padding: 0; color: var(--secondary-color);">
                                 <li>• Employee Turnover Rate</li>
                                 <li>• Retention Rate</li>
@@ -823,8 +807,8 @@
         <!-- SLIDE 6: REGRESSION METHOD -->
         <section id="regression" class="slide">
             <div class="slide-content">
-                <h2>Analitik Metod: Çoxdəyişənli Reqressiya</h2>
-                <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; font-size: 1.1rem; color: var(--secondary-color);">
+                <h2 data-key="method_title">Analitik Metod: Çoxdəyişənli Reqressiya</h2>
+                <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; font-size: 1.1rem; color: var(--secondary-color);" data-key="method_subtitle">
                     Bu, bir nəticəyə (məsələn, Performans) hansı amillərin və nə qədər güclə təsir etdiyini anlamaq üçün istifadə edilən statistik bir metoddur.
                 </p>
                 <div class="content-grid">
@@ -833,80 +817,79 @@
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
                         <h3>R-Square (R-Kvadrat) Nədir?</h3>
-                        <p>Modelimizin izah gücüdür. Bizim analizimizdə R² <strong style="color: var(--primary-color);">19%</strong>-dir. Bu o deməkdir ki, seçdiyimiz amillər (məmnuniyyət, maaş və s.) performansdakı fərqliliyin 19%-ni izah edir.</p>
+                        <p data-key="method_rsquare_desc">Modelimizin izah gücüdür. Bizim analizimizdə R² <strong style="color: var(--primary-color);">19%</strong>-dir. Bu o deməkdir ki, seçdiyimiz amillər (məmnuniyyət, maaş və s.) performansdakı fərqliliyin 19%-ni izah edir.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <h3>P-value (P-Dəyəri) Nədir?</h3>
-                        <p>Bir amilin təsirinin təsadüfi olub-olmadığını göstərir. Qızıl qayda: Əgər P-dəyəri <strong style="color: var(--success-color);">0.05-dən kiçikdirsə</strong>, deməli o amilin təsiri real və statistik olaraq əhəmiyyətlidir.</p>
+                        <p data-key="method_pvalue_desc">Bir amilin təsirinin təsadüfi olub-olmadığını göstərir. Qızıl qayda: Əgər P-dəyəri <strong style="color: var(--success-color);">0.05-dən kiçikdirsə</strong>, deməli o amilin təsiri real və statistik olaraq əhəmiyyətlidir.</p>
                     </div>
                 </div>
             </div>
         </section>
         
-        <!-- SLIDE 7: ANALYSIS RESULTS -->
+        <!-- 7. ANALYSIS (YENİLƏNİB - 30/70 + wrap) -->
         <section id="analysis" class="slide">
             <div class="slide-content">
-                <h2>Canlı Təhlil: Nəticələr</h2>
-                <p style="text-align: center; margin-bottom: 3rem; font-size: 1.1rem; color: var(--secondary-color);">
+                <h2 data-key="analysis_title">Canlı Təhlil: Nəticələr</h2>
+                <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem; color: var(--secondary-color);" data-key="analysis_subtitle">
                     Gəlin hər bir amilin performansımıza təsirinə ayrı-ayrılıqda baxaq.
                 </p>
-                
-                <!-- Interactive Chart -->
-                <div class="chart-container">
-                    <canvas id="regressionChart"></canvas>
+
+                <div class="analysis-layout">
+                    <div class="chart-container">
+                        <canvas id="regressionChart"></canvas>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-key="table_factor">Amil</th>
+                                    <th data-key="table_impact">Təsir Gücü</th>
+                                    <th>P-Dəyəri</th>
+                                    <th data-key="table_desc">Yozum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-key="factor_satisfaction"><strong>Satisfaction_Level</strong></td>
+                                    <td>+0.107</td>
+                                    <td class="p-value-ok">0.000</td>
+                                    <td data-key="desc_satisfaction">Məmnuniyyətin hər 10% artımı performansı təxminən 1.1% artırır.</td>
+                                </tr>
+                                <tr>
+                                    <td data-key="factor_projects"><strong>Number_Project</strong></td>
+                                    <td>+0.036</td>
+                                    <td class="p-value-ok">0.000</td>
+                                    <td data-key="desc_projects">Hər əlavə layihə performansı 3.6% artırır.</td>
+                                </tr>
+                                <tr>
+                                    <td data-key="factor_time"><strong>Time_Spend_Company</strong></td>
+                                    <td>+0.008</td>
+                                    <td class="p-value-ok">0.000</td>
+                                    <td data-key="desc_time">Şirkətdəki hər əlavə il performansı 0.8% artırır.</td>
+                                </tr>
+                                <tr>
+                                    <td data-key="factor_salary"><strong>Is_Salary_High</strong></td>
+                                    <td>-0.015</td>
+                                    <td class="p-value-ok">0.0008</td>
+                                    <td data-key="desc_salary">Yüksək maaş almaq performansı 1.6% azaldır! Ən təəccüblü nəticə.</td>
+                                </tr>
+                                <tr>
+                                    <td data-key="factor_promotion"><strong>Promotion_Last_5Years</strong></td>
+                                    <td>-0.014</td>
+                                    <td class="p-value-bad">0.101</td>
+                                    <td data-key="desc_promotion">Vəzifə artımının performansa statistik təsiri yoxdur.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                
-                <!-- Data Table -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Amil</th>
-                                <th>Təsir Gücü</th>
-                                <th>P-Dəyəri</th>
-                                <th>Yozum</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Satisfaction_Level</strong></td>
-                                <td>+0.107</td>
-                                <td class="p-value-ok">0.000</td>
-                                <td>Məmnuniyyətin hər 10% artımı performansı təxminən 1.1% artırır.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Number_Project</strong></td>
-                                <td>+0.036</td>
-                                <td class="p-value-ok">0.000</td>
-                                <td>Hər əlavə layihə performansı 3.6% artırır.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Time_Spend_Company</strong></td>
-                                <td>+0.008</td>
-                                <td class="p-value-ok">0.000</td>
-                                <td>Şirkətdəki hər əlavə il performansı 0.8% artırır.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Is_Salary_High</strong></td>
-                                <td>-0.015</td>
-                                <td class="p-value-ok">0.0008</td>
-                                <td>Yüksək maaş almaq performansı 1.6% azaldır! Ən təəccüblü nəticə.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Promotion_Last_5Years</strong></td>
-                                <td>-0.014</td>
-                                <td class="p-value-bad">0.101</td>
-                                <td>Vəzifə artımının performansa statistik təsiri yoxdur.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
+
                 <div style="text-align: center;">
-                    <a href="https://www.kaggle.com/datasets/giripujar/hr-analytics" target="_blank" class="action-btn">
+                    <a href="https://www.kaggle.com/datasets/giripujar/hr-analytics" target="_blank" class="action-btn" data-key="btn_download">
                         Analiz edilən datanı yükləyin
                     </a>
                 </div>
@@ -916,47 +899,47 @@
         <!-- SLIDE 8: MYTH BUSTING -->
         <section id="results" class="slide">
             <div class="slide-content">
-                <h2>Performans Miflərinin Dağıdılması</h2>
+                <h2 data-key="myths_title">Performans Miflərinin Dağıdılması</h2>
                 <div class="content-grid">
                     <div class="myth-buster-card">
                         <div class="myth-content">
-                            <h3>
+                            <h3 data-key="myth1_title">
                                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                                 MİF #1: "Yüksək Maaş = Yüksək Performans"
                             </h3>
-                            <p>Ənənəvi düşüncə: Daha çox pul daha yaxşı nəticələr gətirir.</p>
+                            <p data-key="myth1_desc">Ənənəvi düşüncə: Daha çox pul daha yaxşı nəticələr gətirir.</p>
                         </div>
                         <div class="reality-content">
-                            <h3>
+                            <h3 data-key="reality1_title">
                                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                                 REALLIQ: TƏRSİNƏDİR!
                             </h3>
-                            <p>Data sübut etdi ki, digər amillər sabit qaldıqda, <strong>yüksək maaş alan işçilərin performansı əslində daha AŞAĞI olur!</strong></p>
+                            <p data-key="reality1_desc">Data sübut etdi ki, digər amillər sabit qaldıqda, <strong>yüksək maaş alan işçilərin performansı əslində daha AŞAĞI olur!</strong></p>
                         </div>
                     </div>
                     
                     <div class="myth-buster-card">
                         <div class="myth-content">
-                            <h3>
+                            <h3 data-key="myth2_title">
                                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
                                 MİF #2: "Vəzifə Artımı Performansı Artırır"
                             </h3>
-                            <p>Düşünülür ki, vəzifə artımı işçini gələcək uğurlara həvəsləndirir.</p>
+                            <p data-key="myth2_desc">Düşünülür ki, vəzifə artımı işçini gələcək uğurlara həvəsləndirir.</p>
                         </div>
                         <div class="reality-content">
-                            <h3>
+                            <h3 data-key="reality2_title">
                                 <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
                                 REALLIQ: ƏLAQƏSİ YOXDUR!
                             </h3>
-                            <p>Keçmişdə alınan vəzifə artımının bugünkü performansla heç bir statistik əlaqəsi tapılmadı. Vəzifə artımı keçmişin mükafatıdır, gələcəyin zəmanəti deyil.</p>
+                            <p data-key="reality2_desc">Keçmişdə alınan vəzifə artımının bugünkü performansla heç bir statistik əlaqəsi tapılmadı. Vəzifə artımı keçmişin mükafatıdır, gələcəyin zəmanəti deyil.</p>
                         </div>
                     </div>
                 </div>
@@ -966,8 +949,8 @@
         <!-- SLIDE 9: LIMITATIONS -->
         <section id="limits" class="slide">
             <div class="slide-content">
-                <h2>Datanın Aciz Qaldığı Məqam</h2>
-                <p style="text-align: center; max-width: 900px; margin: 0 auto 3rem; font-size: 1.1rem; color: var(--secondary-color);">
+                <h2 data-key="limits_title">Datanın Aciz Qaldığı Məqam</h2>
+                <p style="text-align: center; max-width: 900px; margin: 0 auto 3rem; font-size: 1.1rem; color: var(--secondary-color);" data-key="limits_subtitle">
                     Modelimiz performansın 19%-ni izah etdi. Bəs qalan 81% haradadır? O, rəqəmlərin ölçə bilmədiyi, insanı insan edən amillərdə gizlənib:
                 </p>
                 <div class="content-grid">
@@ -975,22 +958,22 @@
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
                         </div>
-                        <h3>Psixoloji Faktorlar</h3>
-                        <p>İşçinin həmin günkü əhval-ruhiyyəsi, motivasiyası, stress səviyyəsi, şəxsi həyatındakı hadisələr – bunların heç biri bizim databazamızda yoxdur, amma performansa birbaşa təsir edir.</p>
+                        <h3 data-key="limit_1_title">Psixoloji Faktorlar</h3>
+                        <p data-key="limit_1_desc">İşçinin həmin günkü əhval-ruhiyyəsi, motivasiyası, stress səviyyəsi, şəxsi həyatındakı hadisələr – bunların heç biri bizim databazamızda yoxdur, amma performansa birbaşa təsir edir.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
-                        <h3>Sosial Dinamika</h3>
-                        <p>Rəhbəri ilə münasibətinin keyfiyyəti, komanda yoldaşları ilə olan sinerji, şirkət mədəniyyətini necə hiss etməsi kimi sosial amillər performansı formalaşdırır.</p>
+                        <h3 data-key="limit_2_title">Sosial Dinamika</h3>
+                        <p data-key="limit_2_desc">Rəhbəri ilə münasibətinin keyfiyyəti, komanda yoldaşları ilə olan sinerji, şirkət mədəniyyətini necə hiss etməsi kimi sosial amillər performansı formalaşdırır.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                         </div>
-                        <h3>Fərdi Bacarıqlar</h3>
-                        <p>İki eyni maaşlı, eyni məmnuniyyətli işçidən birinin daha istedadlı, daha yaradıcı və ya daha intizamlı olması performansı kökündən dəyişir. Data bu fərdi fərqlilikləri hər zaman tuta bilmir.</p>
+                        <h3 data-key="limit_3_title">Fərdi Bacarıqlar</h3>
+                        <p data-key="limit_3_desc">İki eyni maaşlı, eyni məmnuniyyətli işçidən birinin daha istedadlı, daha yaradıcı və ya daha intizamlı olması performansı kökündən dəyişir. Data bu fərdi fərqlilikləri hər zaman tuta bilmir.</p>
                     </div>
                 </div>
             </div>
@@ -999,28 +982,28 @@
         <!-- SLIDE 10: RECOMMENDATIONS -->
         <section id="recs" class="slide">
             <div class="slide-content">
-                <h2>Bəs İndi Nə Etməli? (Strateji Tövsiyələr)</h2>
+                <h2 data-key="recs_title">Bəs İndi Nə Etməli? (Strateji Tövsiyələr)</h2>
                 <div class="content-grid">
                     <div class="card">
                         <div class="card-icon">
-                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         </div>
-                        <h3>1. Məmnuniyyətə İnvestisiya Edin</h3>
-                        <p>Performansa ən güclü müsbət təsir edən amil <strong>işdən məmnuniyyətdir.</strong> Xoşbəxt işçi daha məhsuldar işçidir. Fokusumuz bu olmalıdır.</p>
+                        <h3 data-key="rec_1_title">1. Məmnuniyyətə İnvestisiya Edin</h3>
+                        <p data-key="rec_1_desc">Performansa ən güclü müsbət təsir edən amil <strong>işdən məmnuniyyətdir.</strong> Xoşbəxt işçi daha məhsuldar işçidir. Fokusumuz bu olmalıdır.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
-                        <h3>2. Kompensasiya Sistemini Gözdən Keçirin</h3>
-                        <p>Əgər yüksək maaş aşağı performansa səbəb olursa, deməli kompensasiya sistemimiz arxayınlaşma yaradır. Sistem <strong>ədalətli və performansa bağlı</strong> olmalıdır.</p>
+                        <h3 data-key="rec_2_title">2. Kompensasiya Sistemini Gözdən Keçirin</h3>
+                        <p data-key="rec_2_desc">Əgər yüksək maaş aşağı performansa səbəb olursa, deməli kompensasiya sistemimiz arxayınlaşma yaradır. Sistem <strong>ədalətli və performansa bağlı</strong> olmalıdır.</p>
                     </div>
                     <div class="card">
                         <div class="card-icon">
                             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                         </div>
-                        <h3>3. Təcrübəni Dəyərləndirin</h3>
-                        <p>Təcrübəli işçiləri qorumaq və onların biliklərini yeni işçilərə ötürmək üçün mentorluq proqramları yaratmaq kritikdir. İnkişaf imkanları vəzifə artımından daha vacib ola bilər.</p>
+                        <h3 data-key="rec_3_title">3. Təcrübəni Dəyərləndirin</h3>
+                        <p data-key="rec_3_desc">Təcrübəli işçiləri qorumaq və onların biliklərini yeni işçilərə ötürmək üçün mentorluq proqramları yaratmaq kritikdir. İnkişaf imkanları vəzifə artımından daha vacib ola bilər.</p>
                     </div>
                 </div>
             </div>
@@ -1029,15 +1012,15 @@
         <!-- SLIDE 11: CONTACT -->
         <section id="contact" class="slide">
             <div class="slide-content" style="text-align: center;">
-                <h2>Dinlədiyiniz Üçün Təşəkkürlər!</h2>
-                <p class="purpose-statement">İndi isə rəqəmlərin pıçıltısını birlikdə müzakirə edək.</p>
+                <h2 data-key="contact_title">Dinlədiyiniz Üçün Təşəkkürlər!</h2>
+                <p class="purpose-statement" data-key="contact_subtitle">İndi isə rəqəmlərin pıçıltısını birlikdə müzakirə edək.</p>
                 
                 <div class="qr-code-container">
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://www.linkedin.com/in/nizamitahir/&bgcolor=ffffff" alt="LinkedIn QR Code">
                 </div>
                 
                 <h3 style="font-size: 2rem; margin-top: 2rem;">Nizami Tahirov</h3>
-                <p style="color: var(--secondary-color); font-size: 1.2rem; margin-top: 0.5rem;">LinkedIn-də əlaqə saxlayaq</p>
+                <p style="color: var(--secondary-color); font-size: 1.2rem; margin-top: 0.5rem;" data-key="contact_linkedin">LinkedIn-də əlaqə saxlayaq</p>
             </div>
         </section>
     </main>
@@ -1049,6 +1032,176 @@
     </footer>
     
     <script>
+        // --- LANGUAGE DATA ---
+        const translations = {
+            az: {
+                // Nav
+                nav_hero: "Giriş", nav_agenda: "Gündəlik", nav_me: "Spiker", nav_analytics: "Analitika",
+                nav_metrics: "Metriklər", nav_regression: "Metod", nav_analysis: "Təhlil", nav_results: "Nəticələr",
+                nav_limits: "Limitlər", nav_recs: "Tövsiyələr", nav_contact: "Əlaqə",
+                // Hero
+                hero_title: "Rəqəmlərin Pıçıltısı",
+                hero_subtitle: "HR Analitika ilə Yüksək Performansın DNT-sini Kəşf Etmək: İntuisiyadan Strateji Anlayışa Keçid.",
+                hero_btn: "Səyahətə Başla →",
+                // Agenda
+                agenda_title: "Bugün Nələri Müzakirə Edəcəyik?",
+                agenda_1_title: "1. Analitikanın Gücü", agenda_1_desc: "HR Analitikanın nə olduğunu və biznes qərarlarını necə dəyişdirdiyini anlayacağıq.",
+                agenda_2_title: "2. Strateji Metriklər", agenda_2_desc: "İşçi təcrübəsinin nəbzini tutan eNPS və ESI kimi müasir indeksləri öyrənəcəyik.",
+                agenda_3_title: "3. Canlı Təhlil", agenda_3_desc: "Real data üzərində Reqressiya Analizi ilə yüksək performansı yaradan əsl səbəbləri axtaracağıq.",
+                agenda_4_title: "4. Data Hekayələri", agenda_4_desc: "Analizin nəticələrini 'danışdıraraq' biznes üçün strateji tövsiyələr çıxaracağıq.",
+                // Speaker
+                speaker_title: "Spiker Haqqında", speaker_role: "HRIS & Rəqəmsallaşdırma Meneceri",
+                speaker_card1_title: "Peşəkar İcmal", speaker_card1_desc: "8+ illik HR və data analitikası təcrübəsi. Microsoft Power Platform ilə avtomatlaşdırma və strateji qərarların dəstəklənməsi.",
+                speaker_card2_title: "Təhsil və Sertifikatlar", speaker_card2_desc: "ADA Universiteti (Magistr), BDU (Bakalavr). 3x Microsoft Certified Trainer, Excel Expert, Power BI.",
+                speaker_card3_title: "Təcrübə", speaker_card3_desc: "Data-əsaslı Performans İdarəetmə, KPI-əsaslı Power BI dashboard-ları və HR proseslərinin 90%-nin avtomatlaşdırılması.",
+                speaker_card4_title: "Portfel və Layihələr", speaker_card4_desc: "McKinsey, AmCham, Willis Towers Watson; İşçi dövriyyəsi, məhsuldarlıq və kompensasiya üzrə analitik hesabatlar.",
+                // Analytics Types
+                analytics_title: "HR Analitika: Kompasımız Nədir?",
+                type_1_title: "Təsviri", type_1_desc: "'Nə baş verdi?' - Keçən rüb işdən ayrılma faizi nə qədər oldu?",
+                type_2_title: "Diaqnostik", type_2_desc: "'Niyə baş verdi?' - Satış şöbəsində dövriyyə niyə yüksəkdir?",
+                type_3_title: "Proqnozlaşdırıcı", type_3_desc: "'Nə baş verəcək?' - Hansı işçilərin getmə riski var?",
+                type_4_title: "Tövsiyəedici", type_4_desc: "'Nə etməliyik?' - Döriyyəni azaltmaq üçün addımlar.",
+                // Metrics
+                metrics_title: "Strateji Metriklər: Nəbzı Necə Tutmalı?",
+                metrics_enps_desc: "Məqsəd: İşçi loyallığını və tövsiyə etmə ehtimalını ölçür.", metrics_enps_calc: "Hesablama: % Təbliğatçılar - % Tənqidçilər",
+                metrics_esi_desc: "Məqsəd: İşçinin hazırkı işindən ümumi məmnuniyyəti.", metrics_esi_calc: "Hesablama: [ (Orta Bal / 3) - 1 ] / 9 * 100",
+                metrics_other_title: "Digər Məşhur Metriklər", metrics_recruiting: "İşə Qəbul", metrics_retention: "Saxlama və Məşğulluq",
+                // Method
+                method_title: "Analitik Metod: Çoxdəyişənli Reqressiya",
+                method_subtitle: "Bu, bir nəticəyə (məsələn, Performans) hansı amillərin və nə qədər güclə təsir etdiyini anlamaq üçün statistik metoddur.",
+                method_rsquare_desc: "Modelin izah gücü 19%. Seçilən amillər performansdakı fərqliliyin 19%-ni izah edir.",
+                method_pvalue_desc: "Əgər P < 0.05, deməli təsir real və statistik olaraq əhəmiyyətlidir.",
+                // Analysis (Dashboard)
+                analysis_title: "Canlı Təhlil: Nəticələr",
+                analysis_subtitle: "Gəlin hər bir amilin performansımıza təsirinə ayrı-ayrılıqda baxaq.",
+                table_factor: "Amil", table_impact: "Təsir Gücü", table_desc: "Yozum",
+                factor_satisfaction: "Məmnuniyyət", desc_satisfaction: "Məmnuniyyətin hər 10% artımı performansı 1.1% artırır.",
+                factor_projects: "Layihə Sayı", desc_projects: "Hər əlavə layihə performansı 3.6% artırır.",
+                factor_time: "Şirkətdəki Müddət", desc_time: "Şirkətdəki hər əlavə il performansı 0.8% artırır.",
+                factor_salary: "Yüksək Maaş", desc_salary: "Yüksək maaş almaq performansı 1.6% azaldır!",
+                factor_promotion: "Vəzifə Artımı", desc_promotion: "Vəzifə artımının performansa statistik təsiri yoxdur.",
+                btn_download: "Analiz edilən datanı yükləyin",
+                // Myths
+                myths_title: "Performans Miflərinin Dağıdılması",
+                myth1_title: "MİF #1: 'Yüksək Maaş = Yüksək Performans'", myth1_desc: "Daha çox pul daha yaxşı nəticələr gətirir.",
+                reality1_title: "REALLIQ: TƏRSİNƏDİR!", reality1_desc: "Digər amillər sabit qaldıqda, yüksək maaş alanların performansı daha AŞAĞI olur!",
+                myth2_title: "MİF #2: 'Vəzifə Artımı Performansı Artırır'", myth2_desc: "Vəzifə artımı işçini motivasiya edir.",
+                reality2_title: "REALLIQ: ƏLAQƏSİ YOXDUR!", reality2_desc: "Keçmiş vəzifə artımının bugünkü performansla statistik əlaqəsi yoxdur.",
+                // Limits
+                limits_title: "Datanın Aciz Qaldığı Məqam",
+                limits_subtitle: "Modelimiz performansın 19%-ni izah etdi. Bəs qalan 81% haradadır?",
+                limit_1_title: "Psixoloji Faktorlar", limit_1_desc: "Stress, motivasiya və şəxsi həyat performansa birbaşa təsir edir.",
+                limit_2_title: "Sosial Dinamika", limit_2_desc: "Rəhbər ilə münasibət və komanda sinerjisi.",
+                limit_3_title: "Fərdi Bacarıqlar", limit_3_desc: "İstedad və yaradıcılıq kimi fərdi fərqliliklər.",
+                // Recs
+                recs_title: "Bəs İndi Nə Etməli? (Strateji Tövsiyələr)",
+                rec_1_title: "1. Məmnuniyyətə İnvestisiya Edin", rec_1_desc: "Ən güclü amil işdən məmnuniyyətdir. Xoşbəxt işçi məhsuldardır.",
+                rec_2_title: "2. Kompensasiya Sistemini Gözdən Keçirin", rec_2_desc: "Sistem ədalətli və performansa bağlı olmalıdır.",
+                rec_3_title: "3. Təcrübəni Dəyərləndirin", rec_3_desc: "Mentorluq proqramları və inkişaf imkanları vacibdir.",
+                // Contact
+                contact_title: "Dinlədiyiniz Üçün Təşəkkürlər!", contact_subtitle: "İndi isə rəqəmlərin pıçıltısını birlikdə müzakirə edək.",
+                contact_linkedin: "LinkedIn-də əlaqə saxlayaq"
+            },
+            en: {
+                // Nav
+                nav_hero: "Intro", nav_agenda: "Agenda", nav_me: "Speaker", nav_analytics: "Analytics",
+                nav_metrics: "Metrics", nav_regression: "Method", nav_analysis: "Analysis", nav_results: "Results",
+                nav_limits: "Limits", nav_recs: "Recs", nav_contact: "Contact",
+                // Hero
+                hero_title: "Whispers of Numbers",
+                hero_subtitle: "Discovering High Performance DNA with HR Analytics: Moving from Intuition to Strategic Insight.",
+                hero_btn: "Start Journey →",
+                // Agenda
+                agenda_title: "What Will We Discuss Today?",
+                agenda_1_title: "1. Power of Analytics", agenda_1_desc: "Understanding what HR Analytics is and how it changes business decisions.",
+                agenda_2_title: "2. Strategic Metrics", agenda_2_desc: "Learning modern indices like eNPS and ESI to gauge employee experience.",
+                agenda_3_title: "3. Live Analysis", agenda_3_desc: "Using Regression Analysis on real data to find true drivers of high performance.",
+                agenda_4_title: "4. Data Storytelling", agenda_4_desc: "Turning analysis results into strategic, data-driven recommendations.",
+                // Speaker
+                speaker_title: "About Speaker", speaker_role: "HRIS & Digitalization Manager",
+                speaker_card1_title: "Professional Overview", speaker_card1_desc: "8+ years in HR & Data Analytics. Automating processes with Microsoft Power Platform and supporting strategic decisions.",
+                speaker_card2_title: "Education & Certs", speaker_card2_desc: "ADA University (MA), BSU (BA). 3x Microsoft Certified Trainer, Excel Expert, Power BI.",
+                speaker_card3_title: "Experience", speaker_card3_desc: "Data-driven Performance Management, KPI-based Power BI dashboards, and automation of 90% of HR processes.",
+                speaker_card4_title: "Portfolio", speaker_card4_desc: "McKinsey, AmCham, Willis Towers Watson; Analytic reports on Turnover, Productivity, and Compensation.",
+                // Analytics Types
+                analytics_title: "HR Analytics: What is our Compass?",
+                type_1_title: "Descriptive", type_1_desc: "'What happened?' - Overview of past turnover rates.",
+                type_2_title: "Diagnostic", type_2_desc: "'Why did it happen?' - Why is sales turnover high?",
+                type_3_title: "Predictive", type_3_desc: "'What will happen?' - Predicting flight risk.",
+                type_4_title: "Prescriptive", type_4_desc: "'What should we do?' - Actions to reduce turnover.",
+                // Metrics
+                metrics_title: "Strategic Metrics: Taking the Pulse",
+                metrics_enps_desc: "Goal: Measures employee loyalty and likelihood to recommend.", metrics_enps_calc: "Calc: % Promoters - % Detractors",
+                metrics_esi_desc: "Goal: Measures overall satisfaction with current job.", metrics_esi_calc: "Calc: [ (Avg Score / 3) - 1 ] / 9 * 100",
+                metrics_other_title: "Other Popular Metrics", metrics_recruiting: "Recruiting", metrics_retention: "Retention & Engagement",
+                // Method
+                method_title: "Analytical Method: Multivariate Regression",
+                method_subtitle: "A statistical method used to measure which factors impact an outcome (e.g., Performance) and how strongly.",
+                method_rsquare_desc: "Model Explanatory Power: 19%. Our selected factors explain 19% of performance variance.",
+                method_pvalue_desc: "If P < 0.05, the result is statistically significant (not random).",
+                // Analysis (Dashboard)
+                analysis_title: "Live Analysis: Results",
+                analysis_subtitle: "Let's look at the impact of each factor on performance individually.",
+                table_factor: "Factor", table_impact: "Impact", table_desc: "Interpretation",
+                factor_satisfaction: "Satisfaction Level", desc_satisfaction: "A 10% increase in satisfaction boosts performance by 1.1%.",
+                factor_projects: "Project Count", desc_projects: "Each additional project increases performance by 3.6%.",
+                factor_time: "Time in Company", desc_time: "Each additional year increases performance by 0.8%.",
+                factor_salary: "High Salary", desc_salary: "High salary actually decreases performance by 1.6%!",
+                factor_promotion: "Promotion", desc_promotion: "Promotions have no statistical impact on performance.",
+                btn_download: "Download Analyzed Data",
+                // Myths
+                myths_title: "Busting Performance Myths",
+                myth1_title: "MYTH #1: 'High Salary = High Performance'", myth1_desc: "More money brings better results.",
+                reality1_title: "REALITY: IT'S THE OPPOSITE!", reality1_desc: "Data proves that holding other factors constant, high earners actually perform LOWER.",
+                myth2_title: "MYTH #2: 'Promotion Boosts Performance'", myth2_desc: "Promotion motivates future success.",
+                reality2_title: "REALITY: NO CORRELATION!", reality2_desc: "Past promotions show no statistical link to current performance.",
+                // Limits
+                limits_title: "Where Data Falls Short",
+                limits_subtitle: "The model explains 19%. Where is the other 81%? It's in the human factors:",
+                limit_1_title: "Psychological Factors", limit_1_desc: "Stress, motivation, and personal life directly impact performance.",
+                limit_2_title: "Social Dynamics", limit_2_desc: "Manager relationships and team synergy.",
+                limit_3_title: "Individual Skills", limit_3_desc: "Talent and creativity differences.",
+                // Recs
+                recs_title: "What Should We Do? (Strategic Recs)",
+                rec_1_title: "1. Invest in Satisfaction", rec_1_desc: "The strongest factor is satisfaction. Happy employees are productive.",
+                rec_2_title: "2. Review Compensation", rec_2_desc: "Ensure the system is fair and performance-linked, not creating complacency.",
+                rec_3_title: "3. Value Experience", rec_3_desc: "Mentorship programs and development opportunities are critical.",
+                // Contact
+                contact_title: "Thank You for Listening!", contact_subtitle: "Let's discuss the whispers of numbers together.",
+                contact_linkedin: "Let's connect on LinkedIn"
+            }
+        };
+
+        function changeLanguage(lang) {
+            // Update active state of buttons
+            document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.lang-option[onclick="changeLanguage('${lang}')"]`).classList.add('active');
+
+            // Update text content
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) {
+                    // Fade out, change text, fade in effect
+                    gsap.to(el, { opacity: 0, duration: 0.2, onComplete: () => {
+                        el.innerText = translations[lang][key];
+                        gsap.to(el, { opacity: 1, duration: 0.2 });
+                    }});
+                }
+            });
+
+            // Update Chart Title if chart exists
+            const chartInstance = Chart.getChart("regressionChart");
+            if (chartInstance) {
+                chartInstance.options.plugins.title.text = lang === 'az' ? 'Performansa Təsir Edən Amillər' : 'Factors Affecting Performance';
+                chartInstance.data.datasets[0].label = lang === 'az' ? 'Təsir Gücü' : 'Impact Strength';
+                chartInstance.data.labels = lang === 'az' 
+                    ? ['Məmnuniyyət', 'Layihə Sayı', 'Təcrübə', 'Maaş', 'Vəzifə Artımı']
+                    : ['Satisfaction', 'Project Count', 'Experience', 'Salary', 'Promotion'];
+                chartInstance.update();
+            }
+        }
+
         // Slides Navigation
         const slides = document.querySelectorAll('.slide');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -1056,37 +1209,36 @@
         let currentSlide = 0;
         
         function showSlide(index) {
-    // Remove active class from all slides
-    slides.forEach(slide => {
-        slide.classList.remove('active');
-        slide.style.opacity = 0;
-        slide.style.visibility = "hidden";
-    });
+            // Remove active class from all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.opacity = 0;
+                slide.style.visibility = "hidden";
+            });
 
-    navLinks.forEach(link => link.classList.remove('active'));
+            navLinks.forEach(link => link.classList.remove('active'));
 
-    // Add active class to current slide
-    slides[index].classList.add('active');
-    slides[index].style.opacity = 1;          // ← BURADA
-    slides[index].style.visibility = "visible";
+            // Add active class to current slide
+            slides[index].classList.add('active');
+            slides[index].style.opacity = 1;
+            slides[index].style.visibility = "visible";
 
-    navLinks[index]?.classList.add('active');
+            navLinks[index]?.classList.add('active');
 
-    // Update progress bar
-    const progress = ((index + 1) / slides.length) * 100;
-    progressBar.style.width = progress + '%';
+            // Update progress bar
+            const progress = ((index + 1) / slides.length) * 100;
+            progressBar.style.width = progress + '%';
 
-    // Animate elements with GSAP
-    const targets = slides[index].querySelectorAll('.card, h1, h2, p, table, canvas');
-    
-    gsap.fromTo(targets,
-        {opacity: 0, y: 20},
-        {opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: 'power2.out'}
-    );
+            // Animate elements with GSAP
+            const targets = slides[index].querySelectorAll('.card, h1, h2, p, table, canvas, .myth-buster-card, .action-btn, .lang-switch');
+            
+            gsap.fromTo(targets,
+                {opacity: 0, y: 20},
+                {opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: 'power2.out'}
+            );
 
-    currentSlide = index;
-}
-
+            currentSlide = index;
+        }
         
         function nextSlide() {
             const next = (currentSlide + 1) % slides.length;
@@ -1122,9 +1274,23 @@
         themeToggle.addEventListener('change', () => {
             document.body.classList.toggle('light-mode');
             document.body.classList.toggle('dark-mode');
+            
+            // Refresh chart colors
+            const isLight = document.body.classList.contains('light-mode');
+            const chartInstance = Chart.getChart("regressionChart");
+            if (chartInstance) {
+                const textColor = isLight ? '#212529' : '#f8f9fa';
+                const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(102, 126, 234, 0.1)';
+                
+                chartInstance.options.plugins.title.color = textColor;
+                chartInstance.options.scales.y.ticks.color = textColor;
+                chartInstance.options.scales.x.ticks.color = textColor;
+                chartInstance.options.scales.y.grid.color = gridColor;
+                chartInstance.update();
+            }
         });
         
-        // Particles.js configuration
+        // Particles.js Configuration (KOD DÜZƏLİŞİ İLƏ TƏMİNAT VERİLİR)
         particlesJS('particles-js', {
             particles: {
                 number: { value: 80, density: { enable: true, value_area: 800 } },
@@ -1133,8 +1299,8 @@
                 opacity: { value: 0.5, random: true },
                 size: { value: 3, random: true },
                 line_linked: {
-                    enable: true,
-                    distance: 150,
+                    enable: true,      // Xətləri aktiv edir
+                    distance: 150,     // Məsafə
                     color: '#667eea',
                     opacity: 0.4,
                     width: 1
@@ -1160,7 +1326,7 @@
             retina_detect: true
         });
         
-        // Chart.js - Regression Analysis Visualization
+        // Chart.js
         const ctx = document.getElementById('regressionChart');
         if (ctx) {
             new Chart(ctx, {
@@ -1168,7 +1334,7 @@
                 data: {
                     labels: ['Məmnuniyyət', 'Layihə Sayı', 'Təcrübə', 'Maaş', 'Vəzifə Artımı'],
                     datasets: [{
-                        label: 'Təsir Gücü (Əmsal)',
+                        label: 'Təsir Gücü',
                         data: [0.107, 0.036, 0.008, -0.015, -0.014],
                         backgroundColor: [
                             'rgba(74, 222, 128, 0.8)',
@@ -1190,14 +1356,14 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false, /* Allows resizing within flex container */
                     plugins: {
                         legend: { display: false },
                         title: {
                             display: true,
                             text: 'Performansa Təsir Edən Amillər',
                             color: '#f8f9fa',
-                            font: { size: 18, weight: 'bold' }
+                            font: { size: 16, weight: 'bold' }
                         }
                     },
                     scales: {
@@ -1208,7 +1374,7 @@
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#adb5bd' }
+                            ticks: { color: '#adb5bd', font: { size: 10 } }
                         }
                     }
                 }
@@ -1225,19 +1391,14 @@
         // Initialize first slide
         showSlide(0);
         
-        // GSAP ScrollTrigger for smooth animations
-        gsap.registerPlugin(ScrollTrigger);
-        
-        // Animate cards on hover with 3D effect
-        document.querySelectorAll('.card').forEach(card => {
+        // 3D effect
+        document.querySelectorAll('.card, .myth-buster-card').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
-                
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
                 const rotateX = (y - centerY) / 10;
                 const rotateY = (centerX - x) / 10;
                 
