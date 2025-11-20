@@ -209,19 +209,24 @@
             min-height: 100vh;
         }
         
-        .slide {
-            min-height: calc(100vh - 80px);
-            display: none;
-            opacity: 0;
-            padding: 3rem 5%;
-        }
-        
-        .slide.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
+.slide {
+    min-height: calc(100vh - 80px);
+    display: block !important;
+    opacity: 0;
+    visibility: hidden;
+    padding: 3rem 5%;
+    position: absolute;
+    width: 100%;
+    top: 80px;
+    left: 0;
+}
+
+.slide.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative;
+}
+
         
         @keyframes slideIn {
             from {
@@ -234,7 +239,8 @@
             }
         }
         
-        .slide-content {
+        
+      -content {
             width: 100%;
             max-width: 1400px;
         }
@@ -1050,29 +1056,37 @@
         let currentSlide = 0;
         
         function showSlide(index) {
-            // Remove active class from all slides
-            slides.forEach(slide => slide.classList.remove('active'));
-            navLinks.forEach(link => link.classList.remove('active'));
-            
-            // Add active class to current slide
-            slides[index].classList.add('active');
-            navLinks[index]?.classList.add('active');
-            
-            // Update progress bar
-            const progress = ((index + 1) / slides.length) * 100;
-            progressBar.style.width = progress + '%';
-            
-            // Animate elements with GSAP
-            gsap.from(slides[index].querySelectorAll('.card, h1, h2, p, .action-btn'), {
-                opacity: 0,
-                y: 30,
-                duration: 0.8,
-                stagger: 0.1,
-                ease: 'power3.out'
-            });
-            
-            currentSlide = index;
-        }
+    // Remove active class from all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+        slide.style.opacity = 0;
+        slide.style.visibility = "hidden";
+    });
+
+    navLinks.forEach(link => link.classList.remove('active'));
+
+    // Add active class to current slide
+    slides[index].classList.add('active');
+    slides[index].style.opacity = 1;          // ← BURADA
+    slides[index].style.visibility = "visible";
+
+    navLinks[index]?.classList.add('active');
+
+    // Update progress bar
+    const progress = ((index + 1) / slides.length) * 100;
+    progressBar.style.width = progress + '%';
+
+    // Animate elements with GSAP
+    const targets = slides[index].querySelectorAll('.card, h1, h2, p, table, canvas');
+    
+    gsap.fromTo(targets,
+        {opacity: 0, y: 20},
+        {opacity: 1, y: 0, duration: 0.6, stagger: 0.05, ease: 'power2.out'}
+    );
+
+    currentSlide = index;
+}
+
         
         function nextSlide() {
             const next = (currentSlide + 1) % slides.length;
